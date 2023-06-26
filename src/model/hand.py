@@ -4,7 +4,7 @@ from scipy.ndimage.filters import gaussian_filter
 import torch
 from skimage.measure import label
 
-from src.model import handpose_model
+from src.model.model import handpose_model
 from src.utils import util
 
 
