@@ -1,4 +1,5 @@
 import cv2
+from matplotlib import pyplot as plt
 
 from src.enum.action import Action
 from src.model.body import Body
@@ -15,7 +16,7 @@ def handle_picture(image):
 
 
 def solve(url):
-    # open the video and get frames
+    # 打开视频并抽取需要的帧识别
     videoCapture = cv2.VideoCapture(url)
     i = 0
     while True:
@@ -25,6 +26,10 @@ def solve(url):
         i += 1
         if i % 100 == 0:
             handle_picture(frame)
+            # plt.imshow(frame[:, :, [2, 1, 0]])
+            # plt.axis('off')
+            # plt.show()
+            break
 
 # 项目总入口，传入视频进行处理
 if __name__ == '__main__':

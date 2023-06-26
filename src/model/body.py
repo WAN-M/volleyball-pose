@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import torch
 
 from src.utils import util
-from src.model import bodypose_model
+from src.model.model import bodypose_model
 
 class Body(object):
     def __init__(self, model_path):
