@@ -3,13 +3,12 @@ import matplotlib.pyplot as plt
 import copy
 import numpy as np
 
-from src import model
-from src import util
-from src.body import Body
-from src.hand import Hand
+from src.utils import util
+from src.model.body import Body
+from src.model.hand import Hand
 
-body_estimation = Body('model/body_pose_model.pth')
-hand_estimation = Hand('model/hand_pose_model.pth')
+body_estimation = Body('../model/body_pose_model.pth')
+hand_estimation = Hand('../model/hand_pose_model.pth')
 
 test_image = 'images/img.png'
 oriImg = cv2.imread(test_image)  # B,G,R order

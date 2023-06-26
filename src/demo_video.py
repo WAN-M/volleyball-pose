@@ -1,17 +1,13 @@
 import copy
 import numpy as np
 import cv2
-from glob import glob
 import os
-import argparse
 import json
 
 # video file processing setup
 # from: https://stackoverflow.com/a/61927951
 import argparse
 import subprocess
-import sys
-from pathlib import Path
 from typing import NamedTuple
 
 
@@ -35,13 +31,12 @@ def ffprobe(file_path) -> FFProbeResult:
 
 
 # openpose setup
-from src import model
-from src import util
-from src.body import Body
-from src.hand import Hand
+from src.utils import util
+from src.model.body import Body
+from src.model.hand import Hand
 
-body_estimation = Body('model/body_pose_model.pth')
-hand_estimation = Hand('model/hand_pose_model.pth')
+body_estimation = Body('../model/body_pose_model.pth')
+hand_estimation = Hand('../model/hand_pose_model.pth')
 
 def process_frame(frame, body=True, hands=True):
     canvas = copy.deepcopy(frame)
