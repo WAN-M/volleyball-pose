@@ -12,6 +12,14 @@ def draw_wrong_place(img, x, y):
     cv2.circle(img, (int(x), int(y)), 10, (0, 0, 255), 1)
 
 
+def num2pos(num, candidate, person)->[]:
+    index = int(person[num])
+    if index == -1:
+        # 该输出信息可以根据num细化到具体哪个关键点
+        raise Exception("输入图像未包含有效关键点")
+
+    return candidate[int(person[num])][0:2]
+
 def padRightDownCorner(img, stride, padValue):
     h = img.shape[0]
     w = img.shape[1]

@@ -1,6 +1,7 @@
 '''
 检测手臂是否处于伸直状态
 '''
+from src.utils import util
 from src.utils.util import draw_wrong_place
 import math
 
@@ -21,14 +22,14 @@ def detect_line(list):
 def get_armPoint(armIndex, candidate, subset):
     list1 = [[] for _ in range(3)]
     for n in range(len(armIndex)):
-        index = int(subset[0][armIndex[n]])
-        #print(index)
-        if index == -1:
-            print("输入图像未包含手臂的全部状况")
-            return None
-        x, y = candidate[index][0:2]
-        list1[n].append(x)
-        list1[n].append(y)
+        # index = int(subset[0][armIndex[n]])
+        # #print(index)
+        # if index == -1:
+        #     raise Exception("输入图像未包含手臂的全部状况")
+        # x, y = candidate[index][0:2]
+        # list1[n].append(x)
+        # list1[n].append(y)
+        list1[n] = util.num2pos(armIndex[n], candidate, subset[0])
         #print(list1)
     return list1
 
