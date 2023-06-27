@@ -1,7 +1,7 @@
 import cv2
 from matplotlib import pyplot as plt
 
-from src.enum.action import Action
+from src.enums.action import Action
 from src.model.body import Body
 from src.rules.rule import Rule
 
