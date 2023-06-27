@@ -41,7 +41,7 @@ class Hand(object):
             # data = data.permute([2, 0, 1]).unsqueeze(0).float()
             with torch.no_grad():
                 output = self.model(data).cpu().numpy()
-                # output = self.model(data).numpy()q
+                # output = self.models(data).numpy()q
 
             # extract outputs, resize, and remove padding
             heatmap = np.transpose(np.squeeze(output), (1, 2, 0))  # output 1 is heatmaps

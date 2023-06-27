@@ -42,7 +42,7 @@ def padRightDownCorner(img, stride, padValue):
 
     return img_padded, pad
 
-# transfer caffe model to pytorch which will match the layer name
+# transfer caffe models to pytorch which will match the layer name
 def transfer(model, model_weights):
     transfered_model_weights = {}
     for weights_name in model.state_dict().keys():
