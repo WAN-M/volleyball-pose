@@ -2,9 +2,9 @@ import cv2
 from matplotlib import pyplot as plt
 from bottle import Bottle, request
 
-from src.enums.action import Action
-from src.model.body import Body
-from src.rules.rule import Rule
+from enums.action import Action
+from model.body import Body
+from rules.rule import Rule
 
 body_estimation = Body('../model/body_pose_model.pth')
 # 目前只做垫球，后续可拓展

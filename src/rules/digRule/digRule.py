@@ -1,5 +1,5 @@
-from src.rules.digRule import armDetect
-from src.rules.digRule import armTorsoAngle
+from rules.digRule import armDetect
+from rules.digRule import armTorsoAngle
 
 
 def sum_rules(image, candidate, subset):
