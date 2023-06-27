@@ -4,6 +4,7 @@ from bottle import Bottle, request
 
 from enums.action import Action
 from model.body import Body
+from result.result import CommonResult
 from rules.rule import Rule
 
 body_estimation = Body('../model/body_pose_model.pth')
@@ -19,18 +20,20 @@ def process():
         solve(url)
     except Exception as e:
         print(e)
+        return CommonResult.fail(e)
     else:
-        print("finish!!!!!!!!!!!")
+        print("完成请求: %s" % url)
 
-    return "success"
-
+    # img1 = cv2.imread("../images/vol.png")
+    # img2 = cv2.imread("../images/hand_preview.png")
+    # return CommonResult.success([img1, img2])
+    return CommonResult.success("message", "data")
 
 #帧中可能有多个人，从中选出需要分析的人
 def select_person(subset):
     sort_subset = sorted(subset, key=lambda x: (-x[-2] / x[-1], -x[-1]))
     #print(sort_subset)
     return sort_subset[0]
-
 
 def handle_picture(image):
     candidate, subset = body_estimation(image)
@@ -48,7 +51,7 @@ def solve(url):
         if not success:
             break
         i += 1
-        if i % 100 == 0:
+        if i % 500 == 0:
             handle_picture(frame)
             plt.imshow(frame[:, :, [2, 1, 0]])
             plt.axis('off')
