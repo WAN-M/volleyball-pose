@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 from src.enum.action import Action
 from src.model.body import Body
 from src.rules.rule import Rule
-from src.utils import util
 
 body_estimation = Body('../model/body_pose_model.pth')
 # 目前只做垫球，后续可拓展
@@ -25,7 +24,7 @@ def solve(url):
         if not success:
             break
         i += 1
-        if i % 100 == 0:
+        if i % 500 == 0:
             handle_picture(frame)
             plt.imshow(frame[:, :, [2, 1, 0]])
             plt.axis('off')
@@ -34,4 +33,9 @@ def solve(url):
 
 # 项目总入口，传入视频进行处理
 if __name__ == '__main__':
-    solve("../videos/KUN.mp4")
+    try:
+        solve("../videos/KUN.mp4")
+    except Exception as e:
+        print(e)
+    else:
+        print("finish!!!!!!!!!!!")

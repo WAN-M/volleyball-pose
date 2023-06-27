@@ -13,26 +13,23 @@ def judge_angle(xm, ym, x1, y1, x2, y2) -> bool:
 
     angle = math.degrees(math.acos((c * c - a * a - b * b) / (-2 * a * b)))
 
+    print("angle of arm and torso is: %f" % angle)
     return angle <= 100
-
-
-def get_pos(num, candidate, subset) -> []:
-    return candidate[int(subset[0][num])][0:2]
 
 
 def detect(image, candidate, subset) -> bool:
     flag = True
     # print(candidate[subset[0][5]][0:2])
     # 判断左臂与躯干，选取5,6,11
-    if not judge_angle(*get_pos(5, candidate, subset),
-                       *get_pos(6, candidate, subset),
-                       *get_pos(11, candidate, subset)):
+    if not judge_angle(*util.num2pos(5, candidate, subset[0]),
+                       *util.num2pos(6, candidate, subset[0]),
+                       *util.num2pos(11, candidate, subset[0])):
         flag = False
-        util.draw_wrong_place(image, *get_pos(5, candidate, subset))
+        util.draw_wrong_place(image, *util.num2pos(5, candidate, subset[0]))
     # 判断右臂与躯干，选取2,3,8
-    if not judge_angle(*get_pos(2, candidate, subset),
-                       *get_pos(3, candidate, subset),
-                       *get_pos(8, candidate, subset)):
+    if not judge_angle(*util.num2pos(2, candidate, subset[0]),
+                       *util.num2pos(3, candidate, subset[0]),
+                       *util.num2pos(8, candidate, subset[0])):
         flag = False
-        util.draw_wrong_place(image, *get_pos(2, candidate, subset))
+        util.draw_wrong_place(image, *util.num2pos(2, candidate, subset[0]))
     return flag
