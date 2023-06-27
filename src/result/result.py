@@ -1,3 +1,4 @@
+import json_tricks as json
 
 
 class CommonResult():
@@ -6,8 +7,10 @@ class CommonResult():
         self.message = message
         self.data = data
 
-    def success(self, data):
-        return CommonResult(200, "操作成功", data)
+    @classmethod
+    def success(self, message, data):
+        return json.dumps(CommonResult(200, message, json.dumps(data)))
 
+    @classmethod
     def fail(self, message):
-        return CommonResult(500, message, None)
+        return json.dumps(CommonResult(500, message, None))
