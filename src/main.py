@@ -22,7 +22,7 @@ def process():
     else:
         print("finish!!!!!!!!!!!")
 
-    return "haha"
+    return "success"
 
 def handle_picture(image):
     candidate, subset = body_estimation(image)
