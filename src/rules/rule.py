@@ -1,4 +1,4 @@
-from src.enum.action import Action
+from src.enums.action import Action
 from src.rules.digRule import digRule
 
 
