@@ -3,7 +3,7 @@
 '''
 import math
 
-from src.utils import util
+from utils import util
 
 
 def judge_angle(xm, ym, x1, y1, x2, y2) -> bool:

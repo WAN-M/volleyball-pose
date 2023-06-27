@@ -1,5 +1,5 @@
-from src.enums.action import Action
-from src.rules.digRule import digRule
+from enums.action import Action
+from rules.digRule import digRule
 
 
 class Rule:

@@ -1,8 +1,8 @@
 '''
 检测手臂是否处于伸直状态
 '''
-from src.utils import util
-from src.utils.util import draw_wrong_place
+from utils import util
+from utils.util import draw_wrong_place
 import math
 
 def detect_line(list):
