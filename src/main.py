@@ -27,7 +27,7 @@ def process():
     # img1 = cv2.imread("../images/vol.png")
     # img2 = cv2.imread("../images/hand_preview.png")
     # return CommonResult.success([img1, img2])
-    return CommonResult.success("success")
+    return CommonResult.success("message", "data")
 
 #帧中可能有多个人，从中选出需要分析的人
 def select_person(subset):
