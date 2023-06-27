@@ -4,6 +4,7 @@ from bottle import Bottle, request
 
 from enums.action import Action
 from model.body import Body
+from result.result import CommonResult
 from rules.rule import Rule
 
 body_estimation = Body('../model/body_pose_model.pth')
@@ -19,10 +20,11 @@ def process():
         solve(url)
     except Exception as e:
         print(e)
+        return CommonResult.fail(e)
     else:
-        print("finish!!!!!!!!!!!")
+        print("完成请求: %s" % url)
 
-    return "success"
+    return CommonResult.success("success")
 
 
 #帧中可能有多个人，从中选出需要分析的人
