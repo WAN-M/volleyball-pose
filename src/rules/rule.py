@@ -1,5 +1,5 @@
-from enums.action import Action
-from rules.digRule import digRule
+from src.enums.action import Action
+from src.rules.dig import digRule
 
 
 class Rule:
@@ -9,6 +9,6 @@ class Rule:
     def __call__(self, image, candidate, person, *args, **kwargs):
         # 按顺序调用具体规则
         if self.type is Action.Dig:
-            digRule.sum_rules(image, candidate, person)
+            return digRule.sum_rules(image, candidate, person)
         else:
-            print("暂不支持该动作")
+            return "暂不支持该动作"

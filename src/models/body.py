@@ -5,8 +5,8 @@ from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
 import torch
 
-from utils import util
-from model.model import bodypose_model
+from src.utils import util
+from src.models.model import bodypose_model
 
 class Body(object):
     def __init__(self, model_path):

@@ -1,9 +1,0 @@
-from rules.digRule import armDetect
-from rules.digRule import armTorsoAngle
-
-
-def sum_rules(image, candidate, person):
-    if not armDetect.detect_arm_status(image, candidate, person):
-        print("手臂未保持直线")
-    if not armTorsoAngle.detect(image, candidate, person):
-        print("手臂与躯干最大角度不应超过100°")
