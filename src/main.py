@@ -24,10 +24,19 @@ def process():
 
     return "success"
 
+
+#帧中可能有多个人，从中选出需要分析的人
+def select_person(subset):
+    sort_subset = sorted(subset, key=lambda x: (-x[-2] / x[-1], -x[-1]))
+    #print(sort_subset)
+    return sort_subset[0]
+
+
 def handle_picture(image):
     candidate, subset = body_estimation(image)
     # 利用规则判断，并在图片上绘出不标准点
-    rule(image, candidate, subset)
+    person = select_person(subset)
+    rule(image, candidate, person)
 
 
 def solve(url):
@@ -39,7 +48,7 @@ def solve(url):
         if not success:
             break
         i += 1
-        if i % 500 == 0:
+        if i % 100 == 0:
             handle_picture(frame)
             plt.imshow(frame[:, :, [2, 1, 0]])
             plt.axis('off')
@@ -48,5 +57,5 @@ def solve(url):
 
 # 项目总入口，传入视频进行处理
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000)
     print("项目已启动")
+    app.run(host='localhost', port=5000)

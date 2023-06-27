@@ -3,7 +3,7 @@
 '''
 import math
 
-from utils import util
+from src.utils import util
 
 
 def judge_angle(xm, ym, x1, y1, x2, y2) -> bool:
@@ -17,19 +17,19 @@ def judge_angle(xm, ym, x1, y1, x2, y2) -> bool:
     return angle <= 100
 
 
-def detect(image, candidate, subset) -> bool:
+def detect(image, candidate, person) -> bool:
     flag = True
-    # print(candidate[subset[0][5]][0:2])
+    # print(candidate[person[5]][0:2])
     # 判断左臂与躯干，选取5,6,11
-    if not judge_angle(*util.num2pos(5, candidate, subset[0]),
-                       *util.num2pos(6, candidate, subset[0]),
-                       *util.num2pos(11, candidate, subset[0])):
+    if not judge_angle(*util.num2pos(5, candidate, person),
+                       *util.num2pos(6, candidate, person),
+                       *util.num2pos(11, candidate, person)):
         flag = False
-        util.draw_wrong_place(image, *util.num2pos(5, candidate, subset[0]))
+        util.draw_wrong_place(image, *util.num2pos(5, candidate, person))
     # 判断右臂与躯干，选取2,3,8
-    if not judge_angle(*util.num2pos(2, candidate, subset[0]),
-                       *util.num2pos(3, candidate, subset[0]),
-                       *util.num2pos(8, candidate, subset[0])):
+    if not judge_angle(*util.num2pos(2, candidate, person),
+                       *util.num2pos(3, candidate, person),
+                       *util.num2pos(8, candidate, person)):
         flag = False
-        util.draw_wrong_place(image, *util.num2pos(2, candidate, subset[0]))
+        util.draw_wrong_place(image, *util.num2pos(2, candidate, person))
     return flag
