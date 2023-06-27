@@ -1,7 +1,9 @@
 '''
 检测手臂是否处于伸直状态
 '''
+from src.utils.util import draw_wrong_place
 import math
+
 def detect_line(list):
     point_1 = list[0]
     point_2 = list[1]
@@ -31,6 +33,7 @@ def get_armPoint(armIndex, candidate, subset):
     return list1
 
 def detect_arm_status(image, candidate, subset):
+    status = True
     arms = [2, 3, 4]
     list1 = get_armPoint(arms, candidate, subset)
     leftAngle = 0
@@ -45,8 +48,13 @@ def detect_arm_status(image, candidate, subset):
         print("The left hand angle is %f, The right hand angle is %f" %(leftAngle, rightAngle))
     if leftAngle < 170 and leftAngle != 0:
         print("The left hand isn't straight enough")
+        draw_wrong_place(image, list1[1][0], list1[1][1])
+        status = False
     if rightAngle < 170 and rightAngle != 0:
         print("The right hand isn't straight enough")
+        draw_wrong_place(image, list2[1][0], list2[1][1])
+        status = False
     if leftAngle != 0 and rightAngle != 0:
         print("OK")
+    return status
 

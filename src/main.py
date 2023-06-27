@@ -6,7 +6,7 @@ from src.model.body import Body
 from src.rules.rule import Rule
 from src.utils import util
 
-body_estimation = Body('../model/body_pose_model.pth')
+body_estimation = Body('model/body_pose_model.pth')
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
 
@@ -26,8 +26,8 @@ def solve(url):
             break
         i += 1
         if i % 100 == 0:
-            # handle_picture(frame)
-            util.draw_wrong_place(frame, 100, 100)
+            handle_picture(frame)
+            #util.draw_wrong_place(frame, 100, 100)
             plt.imshow(frame[:, :, [2, 1, 0]])
             plt.axis('off')
             plt.show()
@@ -35,4 +35,4 @@ def solve(url):
 
 # 项目总入口，传入视频进行处理
 if __name__ == '__main__':
-    solve("E:\\cv\\volleyball-pose\\videos\\KUN.mp4")
+    solve("D:\\volleyball-pose\\videos\\kunkun_cut.mp4")
