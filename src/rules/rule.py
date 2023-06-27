@@ -9,6 +9,6 @@ class Rule:
     def __call__(self, image, candidate, subset, *args, **kwargs):
         # 按顺序调用具体规则
         if self.type is Action.Dig:
-            digRule.sum_rules()
+            digRule.sum_rules(image, candidate, subset)
         else:
             print("暂不支持该动作")

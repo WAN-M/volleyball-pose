@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
+def draw_wrong_place(img, x, y):
+    cv2.circle(img, (int(x), int(y)), 10, (0, 0, 255), 1)
+
 
 def padRightDownCorner(img, stride, padValue):
     h = img.shape[0]
