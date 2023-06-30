@@ -4,6 +4,7 @@
 import math
 
 from src.utils import util
+from src.utils.logger import Log
 
 
 def judge_angle(xm, ym, x1, y1, x2, y2) -> bool:
@@ -13,7 +14,8 @@ def judge_angle(xm, ym, x1, y1, x2, y2) -> bool:
 
     angle = math.degrees(math.acos((c * c - a * a - b * b) / (-2 * a * b)))
 
-    print("angle of arm and torso is: %f" % angle)
+    Log.debug("手臂与躯干的角度为%f" % angle)
+    # print("angle of arm and torso is: %f" % angle)
     return angle <= 100
 
 
@@ -26,10 +28,14 @@ def detect(image, candidate, person) -> bool:
                        *util.num2pos(11, candidate, person)):
         flag = False
         util.draw_wrong_place(image, *util.num2pos(5, candidate, person))
+        Log.info("左臂抬起过高")
     # 判断右臂与躯干，选取2,3,8
     if not judge_angle(*util.num2pos(2, candidate, person),
                        *util.num2pos(3, candidate, person),
                        *util.num2pos(8, candidate, person)):
         flag = False
         util.draw_wrong_place(image, *util.num2pos(2, candidate, person))
+        Log.info("右臂抬起过高")
+    Log.debug("armTorsoAngle执行完成")
+
     return flag

@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import cv2
@@ -8,28 +9,34 @@ from src.enums.action import Action
 from src.models.body import Body
 from src.result.result import CommonResult
 from src.rules.rule import Rule
+from src.utils.logger import Log
 
 debug = False
 
 body_estimation = Body('./model/body_pose_model.pth')
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
+
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
 
+
 app = Bottle()
+logging.getLogger('log').setLevel(logging.WARNING)
 
 
 @app.route('/cv', method='POST')
 def process():
     url = request.json
+    client_ip = request.environ.get('REMOTE_ADDR')
+    Log.info("IP: " + client_ip + " FILE: " + url)
     try:
         messages, images = solve(url)
     except Exception as e:
-        print(e)
+        Log.error(e)
         return CommonResult.fail(e)
     else:
-        print("完成请求: %s" % url)
+        Log.info("完成请求: %s" % url)
         # plt.imshow(images[0][:, :, [2, 1, 0]])
         # plt.axis('off')
         # plt.show()
@@ -60,8 +67,6 @@ def solve(url):
     # 存储所有姿态不标准信息
     all_mes = set()
     all_img = []
-
-    print(Path(url).suffix[1:])
     if Path(url).suffix[1:] in VID_FORMATS:
         # 打开视频并抽取需要的帧识别
         videoCapture = cv2.VideoCapture(url)
@@ -75,7 +80,7 @@ def solve(url):
                 try:
                     pic_mes = handle_picture(frame)
                 except Exception as e:
-                    print(e)
+                    Log.error(e)
                     continue
 
                 # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
@@ -109,8 +114,8 @@ def solve(url):
 
 # 项目总入口，传入视频进行处理
 if __name__ == '__main__':
-    print("项目已启动")
+    Log.info("项目已启动")
     if debug:
         solve("../videos/KUN.mp4")
     else:
-        app.run(host='localhost', port=5000)
+        app.run(host='localhost', port=5000, )
