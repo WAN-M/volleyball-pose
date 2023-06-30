@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import cv2
 from matplotlib import pyplot as plt
 from bottle import Bottle, request
@@ -12,6 +14,8 @@ debug = False
 body_estimation = Body('./model/body_pose_model.pth')
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
+IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
+VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
 
 app = Bottle()
 
@@ -29,7 +33,7 @@ def process():
         # plt.imshow(images[0][:, :, [2, 1, 0]])
         # plt.axis('off')
         # plt.show()
-        # return CommonResult.success(messages, images)
+        return CommonResult.success(messages, images)
 
     # img1 = cv2.imread("./images/vol.png")
     # img2 = cv2.imread("./images/hand_preview.png")
@@ -57,38 +61,49 @@ def solve(url):
     all_mes = set()
     all_img = []
 
-    # 打开视频并抽取需要的帧识别
-    videoCapture = cv2.VideoCapture(url)
-    i = 0
-    while True:
-        success, frame = videoCapture.read()
-        if not success:
-            break
-        i += 1
-        if i % 500 == 0:
-            try:
-                pic_mes = handle_picture(frame)
-            except Exception as e:
-                print(e)
-                continue
+    print(Path(url).suffix[1:])
+    if Path(url).suffix[1:] in VID_FORMATS:
+        # 打开视频并抽取需要的帧识别
+        videoCapture = cv2.VideoCapture(url)
+        i = 0
+        while True:
+            success, frame = videoCapture.read()
+            if not success:
+                break
+            i += 1
+            if i % 500 == 0:
+                try:
+                    pic_mes = handle_picture(frame)
+                except Exception as e:
+                    print(e)
+                    continue
 
-            # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
-            flag = False
-            for message in pic_mes:
-                if message not in all_mes:
-                    all_mes.add(message)
-                    flag = True
-            if flag:
-                all_img.append(frame)
+                # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
+                flag = False
+                for message in pic_mes:
+                    if message not in all_mes:
+                        all_mes.add(message)
+                        flag = True
+                if flag:
+                    all_img.append(frame)
 
-            # plt.imshow(frame[:, :, [2, 1, 0]])
-            # plt.axis('off')
-            # plt.show()
-            # break
-
+                # plt.imshow(frame[:, :, [2, 1, 0]])
+                # plt.axis('off')
+                # plt.show()
+                # break
+    # 上传的图片
+    elif Path(url).suffix[1:] in IMG_FORMATS:
+        image = cv2.imread(url, 1)
+        try:
+            pic_mes = handle_picture(image)
+        except Exception as e:
+            print(e)
+        if len(pic_mes) > 0:
+            all_mes = pic_mes
+            all_img.append(image)
     # 不存在有效图像
-    if len(all_img) == 0:
-        raise Exception("视频不符合要求")
+    else:
+        raise Exception("上传的文件不符合要求")
     return list(all_mes), all_img
 
 
