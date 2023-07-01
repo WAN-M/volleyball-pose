@@ -1,0 +1,5 @@
+train: ./data/ball/train/images
+val: ./data/ball/valid/images
+
+nc: 2
+names: ['Volleyball']

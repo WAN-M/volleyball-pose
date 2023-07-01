@@ -1,8 +1,8 @@
+import copy
 import logging
 from pathlib import Path
 
 import cv2
-from matplotlib import pyplot as plt
 from bottle import Bottle, request
 
 from src.enums.action import Action
@@ -10,10 +10,16 @@ from src.models.body import Body
 from src.result.result import CommonResult
 from src.rules.rule import Rule
 from src.utils.logger import Log
+from volleyball_detect import detect_new
+from volleyball_detect.models.common import DetectMultiBackend
+from volleyball_detect.utils.torch_utils import select_device
 
-debug = False
+debug = True
 
 body_estimation = Body('./model/body_pose_model.pth')
+
+device = select_device('')
+volleyball_model = DetectMultiBackend('./volleyball_detect/yolov5x.pt', device=device, dnn=False, data='data/coco128.yaml', fp16=False)
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
 
@@ -57,7 +63,10 @@ def select_person(subset):
 
 # 返回图片中不标准的姿势信息，并在图片上标出位置
 def handle_picture(image):
-    candidate, subset = body_estimation(image)
+    image0 = copy.deepcopy(image)
+    candidate, subset = body_estimation(image0)
+    ball_pose = detect_new.main(image0, volleyball_model)
+    #Log.info("(%d %d), (%d, %d)" %(int(ball_pose[0]), int(ball_pose[1]), int(ball_pose[2]), int(ball_pose[3])))
     # 利用规则判断，并在图片上绘出不标准点
     person = select_person(subset)
     return rule(image, candidate, person)
@@ -76,7 +85,8 @@ def solve(url):
             if not success:
                 break
             i += 1
-            if i % 500 == 0:
+            if i % 100 == 0:
+                pic_mes = ""
                 try:
                     pic_mes = handle_picture(frame)
                 except Exception as e:
@@ -99,6 +109,7 @@ def solve(url):
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
+        pic_mes = ""
         try:
             pic_mes = handle_picture(image)
         except Exception as e:
@@ -116,6 +127,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("../videos/KUN.mp4")
+        solve("./videos/test2.mp4")
     else:
         app.run(host='localhost', port=5000, )
