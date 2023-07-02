@@ -7,7 +7,7 @@ from src.utils.augmentations import letterbox
 ROOT = ""
 
 
-def detect_ball(
+def run(
         model,
         image,  # file/dir/URL/glob/screen/0(webcam)
         conf_thres=0.25,  # confidence threshold

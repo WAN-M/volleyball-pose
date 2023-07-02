@@ -1,26 +1,22 @@
 import copy
-import logging
 from pathlib import Path
 
 import cv2
 from bottle import Bottle, request
 
 from src.enums.action import Action
-from src.models.ball import detect_ball
-from src.models.body import Body
-from src.models.common import DetectMultiBackend
 from src.result.result import CommonResult
 from src.rules.rule import Rule
+from src.utils.dataloaders import DigVideoLoader
+from src.utils.detect import detect_person, detect_ball
 from src.utils.logger import Log
-from src.utils.torch_utils import select_device
-from src.utils.util import draw_wrong_place
 
 debug = True
 
-body_estimation = Body('./model/body_pose_model.pth')
 
-device = select_device()
-volleyball_model = DetectMultiBackend('./model/yolov5x.pt', device=device, dnn=False, data='data/coco128.yaml')
+
+
+
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
 
@@ -53,26 +49,20 @@ def process():
     # return CommonResult.success("message", "data")
 
 
-# 帧中可能有多个人，从中选出需要分析的人
-def select_person(subset):
-    sort_subset = sorted(subset, key=lambda x: (-x[-2] / x[-1], -x[-1]))
-    # print(sort_subset)
-    return sort_subset[0]
 
 
 # 返回图片中不标准的姿势信息，并在图片上标出位置
 def handle_picture(image):
     image0 = copy.deepcopy(image)
-    candidate, subset = body_estimation(image0)
-    ball_pose = detect_ball(volleyball_model, image0)
-    draw_wrong_place(image, int(ball_pose[0]), int(ball_pose[1]))
-    draw_wrong_place(image, int(ball_pose[2]), int(ball_pose[3]))
-    cv2.imshow("ii", image)
-    cv2.waitKey(0)
+    candidate, person = detect_person(image0)
+    ball_pose = detect_ball(image0)
+    # draw_wrong_place(image, int(ball_pose[0]), int(ball_pose[1]))
+    # draw_wrong_place(image, int(ball_pose[2]), int(ball_pose[3]))
+    # cv2.imshow("ii", image)
+    # cv2.waitKey(0)
 
     # Log.info("(%d %d), (%d, %d)" %(int(ball_pose[0]), int(ball_pose[1]), int(ball_pose[2]), int(ball_pose[3])))
     # 利用规则判断，并在图片上绘出不标准点
-    person = select_person(subset)
     return rule(image, candidate, person)
 
 
@@ -82,20 +72,16 @@ def solve(url):
     all_img = []
     if Path(url).suffix[1:] in VID_FORMATS:
         # 打开视频并抽取需要的帧识别
-        videoCapture = cv2.VideoCapture(url)
-        i = 0
-        while True:
-            success, frame = videoCapture.read()
-            if not success:
-                break
+        videoLoader = DigVideoLoader(url)
 
-            if i % 100 == 0:
-                # try:
-                #     pic_mes = handle_picture(frame)
-                # except Exception as e:
-                #     Log.error(e)
-                #     continue
-                pic_mes = handle_picture(frame)
+        for i, frame in videoLoader:
+            if i % 5 == 0:
+                try:
+                    pic_mes = handle_picture(frame)
+                except Exception as e:
+                    Log.error(e)
+                    continue
+                # pic_mes = handle_picture(frame)
 
                 # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
                 flag = False
@@ -106,12 +92,6 @@ def solve(url):
                 if flag:
                     all_img.append(frame)
 
-                # plt.imshow(frame[:, :, [2, 1, 0]])
-                # plt.axis('off')
-                # plt.show()
-                # break
-
-            i += 1
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
@@ -133,6 +113,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./images/vol.png")
+        solve("./videos/test.mp4")
     else:
         app.run(host='localhost', port=5000, )
