@@ -6,29 +6,28 @@ import cv2
 from bottle import Bottle, request
 
 from src.enums.action import Action
+from src.models.ball import detect_ball
 from src.models.body import Body
+from src.models.common import DetectMultiBackend
 from src.result.result import CommonResult
 from src.rules.rule import Rule
 from src.utils.logger import Log
-from volleyball_detect import detect_new
-from volleyball_detect.models.common import DetectMultiBackend
-from volleyball_detect.utils.torch_utils import select_device
+from src.utils.torch_utils import select_device
+from src.utils.util import draw_wrong_place
 
 debug = True
 
 body_estimation = Body('./model/body_pose_model.pth')
 
-device = select_device('')
-volleyball_model = DetectMultiBackend('./volleyball_detect/yolov5x.pt', device=device, dnn=False, data='data/coco128.yaml', fp16=False)
+device = select_device()
+volleyball_model = DetectMultiBackend('./model/yolov5x.pt', device=device, dnn=False, data='data/coco128.yaml')
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
 
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
 
-
 app = Bottle()
-logging.getLogger('log').setLevel(logging.WARNING)
 
 
 @app.route('/cv', method='POST')
@@ -65,8 +64,13 @@ def select_person(subset):
 def handle_picture(image):
     image0 = copy.deepcopy(image)
     candidate, subset = body_estimation(image0)
-    ball_pose = detect_new.main(image0, volleyball_model)
-    #Log.info("(%d %d), (%d, %d)" %(int(ball_pose[0]), int(ball_pose[1]), int(ball_pose[2]), int(ball_pose[3])))
+    ball_pose = detect_ball(volleyball_model, image0)
+    draw_wrong_place(image, int(ball_pose[0]), int(ball_pose[1]))
+    draw_wrong_place(image, int(ball_pose[2]), int(ball_pose[3]))
+    cv2.imshow("ii", image)
+    cv2.waitKey(0)
+
+    # Log.info("(%d %d), (%d, %d)" %(int(ball_pose[0]), int(ball_pose[1]), int(ball_pose[2]), int(ball_pose[3])))
     # 利用规则判断，并在图片上绘出不标准点
     person = select_person(subset)
     return rule(image, candidate, person)
@@ -84,14 +88,14 @@ def solve(url):
             success, frame = videoCapture.read()
             if not success:
                 break
-            i += 1
+
             if i % 100 == 0:
-                pic_mes = ""
-                try:
-                    pic_mes = handle_picture(frame)
-                except Exception as e:
-                    Log.error(e)
-                    continue
+                # try:
+                #     pic_mes = handle_picture(frame)
+                # except Exception as e:
+                #     Log.error(e)
+                #     continue
+                pic_mes = handle_picture(frame)
 
                 # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
                 flag = False
@@ -106,6 +110,8 @@ def solve(url):
                 # plt.axis('off')
                 # plt.show()
                 # break
+
+            i += 1
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
@@ -127,6 +133,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./videos/test2.mp4")
+        solve("./images/vol.png")
     else:
         app.run(host='localhost', port=5000, )
