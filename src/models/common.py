@@ -20,12 +20,37 @@ from PIL import Image
 from torch.cuda import amp
 
 from src.utils.augmentations import letterbox
-from src.utils.dataloaders import exif_transpose
 from src.utils.general import (ROOT, Profile, check_requirements, check_suffix, check_version, colorstr,
-                           increment_path, is_jupyter, make_divisible, non_max_suppression, scale_boxes, xywh2xyxy,
-                           xyxy2xywh, yaml_load)
+                               increment_path, is_jupyter, make_divisible, non_max_suppression, scale_boxes, xywh2xyxy,
+                               xyxy2xywh, yaml_load)
 from src.utils.logger import Log
 from src.utils.torch_utils import copy_attr, smart_inference_mode
+
+
+def exif_transpose(image):
+    """
+    Transpose a PIL image accordingly if it has an EXIF Orientation tag.
+    Inplace version of https://github.com/python-pillow/Pillow/blob/master/src/PIL/ImageOps.py exif_transpose()
+
+    :param image: The image to transpose.
+    :return: An image.
+    """
+    exif = image.getexif()
+    orientation = exif.get(0x0112, 1)  # default 1
+    if orientation > 1:
+        method = {
+            2: Image.FLIP_LEFT_RIGHT,
+            3: Image.ROTATE_180,
+            4: Image.FLIP_TOP_BOTTOM,
+            5: Image.TRANSPOSE,
+            6: Image.ROTATE_270,
+            7: Image.TRANSVERSE,
+            8: Image.ROTATE_90}.get(orientation)
+        if method is not None:
+            image = image.transpose(method)
+            del exif[0x0112]
+            image.info['exif'] = exif.tobytes()
+    return image
 
 
 def autopad(k, p=None, d=1):  # kernel, padding, dilation
@@ -356,7 +381,6 @@ class DetectMultiBackend(nn.Module):
             for _ in range(1):  #
                 self.forward(im)  # warmup
 
-
     # @staticmethod
     # def _load_metadata(f=Path('path/to/meta.yaml')):
     #     # Load metadata from meta.yaml if it exists
@@ -364,6 +388,7 @@ class DetectMultiBackend(nn.Module):
     #         d = yaml_load(f)
     #         return d['stride'], d['names']  # assign stride, names
     #     return None, None
+
 
 class AutoShape(nn.Module):
     # YOLOv5 input-robust model wrapper for passing cv2/np/PIL/torch inputs. Includes preprocessing, inference and NMS
@@ -531,7 +556,6 @@ class Detections:
             if save:
                 Log.info(f'Saved results to {save_dir}\n')
             return crops
-
 
     def show(self, labels=True):
         self._run(show=True, labels=labels)  # show results
