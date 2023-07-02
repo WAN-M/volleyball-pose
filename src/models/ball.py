@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from src.models.general import Profile, non_max_suppression, scale_boxes
+from src.utils.general import Profile, non_max_suppression, scale_boxes
 from src.utils.augmentations import letterbox
 
 ROOT = ""
@@ -47,6 +47,7 @@ def detect_ball(
     # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
 
     # Process predictions
+    temp_xyxy = None
     for i, det in enumerate(pred):  # per image
 
         im0 = image.copy()

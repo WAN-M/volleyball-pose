@@ -4,7 +4,6 @@ from pathlib import Path
 
 import cv2
 from bottle import Bottle, request
-from matplotlib import pyplot as plt
 
 from src.enums.action import Action
 from src.models.ball import detect_ball
@@ -12,7 +11,6 @@ from src.models.body import Body
 from src.models.common import DetectMultiBackend
 from src.result.result import CommonResult
 from src.rules.rule import Rule
-from src.utils.dataloaders import VID_FORMATS, IMG_FORMATS
 from src.utils.logger import Log
 from src.utils.torch_utils import select_device
 from src.utils.util import draw_wrong_place
@@ -26,8 +24,10 @@ volleyball_model = DetectMultiBackend('./model/yolov5x.pt', device=device, dnn=F
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
 
+IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
+VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
+
 app = Bottle()
-logging.getLogger('log').setLevel(logging.WARNING)
 
 
 @app.route('/cv', method='POST')
@@ -67,9 +67,9 @@ def handle_picture(image):
     ball_pose = detect_ball(volleyball_model, image0)
     draw_wrong_place(image, int(ball_pose[0]), int(ball_pose[1]))
     draw_wrong_place(image, int(ball_pose[2]), int(ball_pose[3]))
-    plt.imshow(image[:, :, [2, 1, 0]])
-    plt.axis('off')
-    plt.show()
+    cv2.imshow("ii", image)
+    cv2.waitKey(0)
+
     # Log.info("(%d %d), (%d, %d)" %(int(ball_pose[0]), int(ball_pose[1]), int(ball_pose[2]), int(ball_pose[3])))
     # 利用规则判断，并在图片上绘出不标准点
     person = select_person(subset)
@@ -88,7 +88,7 @@ def solve(url):
             success, frame = videoCapture.read()
             if not success:
                 break
-            i += 1
+
             if i % 100 == 0:
                 # try:
                 #     pic_mes = handle_picture(frame)
@@ -110,6 +110,8 @@ def solve(url):
                 # plt.axis('off')
                 # plt.show()
                 # break
+
+            i += 1
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
