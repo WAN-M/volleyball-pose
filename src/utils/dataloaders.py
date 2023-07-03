@@ -2,12 +2,13 @@ import cv2
 
 from src.utils.logger import Log
 from src.utils.util import num2pos
+from src.utils.detect import detect_person, detect_ball
 
 
 class VideoLoader():
-    def __init__(self, url):
-        from src.utils.detect import detect_person, detect_ball
+    def __init__(self, url, gap):
         self.videoCapture = cv2.VideoCapture(url)
+        Log.info("视频帧率: " + str(self.videoCapture.get(cv2.CAP_PROP_FPS)))
         while True:
             success, frame = self.videoCapture.read()
             if not success:
@@ -20,8 +21,12 @@ class VideoLoader():
                 if self._satisfy_(candidate, person, ball):
                     break
             except Exception as e:
-                Log.debug(e)
+                # traceback.print_exc()
                 Log.debug("未识别到所需信息")
+
+        self.gap = gap
+        self.round = 1
+        self.sustaining = False
         Log.debug("视频已定位到垫球动作开始位置")
 
     def _satisfy_(self, candidate, person, ball):
@@ -32,16 +37,28 @@ class VideoLoader():
         return self
 
     def __next__(self):
-        success, frame = self.videoCapture.read()
-        if not success:
-            raise StopIteration
         self.cnt += 1
-        return self.cnt, frame
+        while self.cnt % self.gap != 0:
+            success, frame = self.videoCapture.read()
+            if not success:
+                raise StopIteration
+            self.cnt += 1
+
+        candidate, person = detect_person(frame)
+        ball = detect_ball(frame)
+        if self._satisfy_(candidate, person, ball):
+            if self.sustaining:
+                self.round += 1
+                self.sustaining = False
+        else:
+            self.sustaining = True
+
+        return candidate, person, ball, frame, self.round
 
 
 class DigVideoLoader(VideoLoader):
-    def __init__(self, url):
-        super().__init__(url)
+    def __init__(self, url, gap):
+        super().__init__(url, gap)
 
     # 1. 球位于小臂之间
     # 2. 球与手臂保持水平
