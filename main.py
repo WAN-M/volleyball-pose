@@ -16,7 +16,7 @@ debug = True
 rule = Rule(Action.Dig)
 
 # 视频取帧的间隔数
-video_gap = 8
+video_gap = 5
 
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
@@ -32,8 +32,8 @@ def process():
     try:
         messages, images = solve(url)
     except Exception as e:
-        Log.error(e)
-        return CommonResult.fail(e)
+        Log.error(str(e))
+        return CommonResult.fail(str(e))
     else:
         Log.info("完成请求: %s" % url)
         return CommonResult.success(messages, images)
@@ -48,10 +48,12 @@ def solve(url):
 
         for candidate, person, ball, frame, round in videoLoader:
             if round > 1: break
+            # cv2.imshow("ii", frame)
+            # cv2.waitKey(0)
             try:
                 pic_mes = rule(frame, candidate, person, ball)
             except Exception as e:
-                Log.error(e)
+                Log.error(str(e))
                 continue
 
             # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
@@ -62,6 +64,8 @@ def solve(url):
                     flag = True
             if flag:
                 all_img.append(frame)
+                # cv2.imshow("ii", frame)
+                # cv2.waitKey(0)
 
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
@@ -72,7 +76,7 @@ def solve(url):
             ball = detect_ball(image)
             pic_mes = rule(image, candidate, person, ball)
         except Exception as e:
-            Log.error(e)
+            Log.error(str(e))
         if len(pic_mes) > 0:
             all_mes = pic_mes
             all_img.append(image)

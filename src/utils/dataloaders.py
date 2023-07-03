@@ -80,9 +80,9 @@ class DigVideoLoader(VideoLoader):
 
         if ball is None: return False
         ball_circle = (ball[0] + ball[2]) / 2
-        x = [p3[0], p4[0], ball_circle].sort()
-        y = [p3[1], p4[1], ball[3]].sort()
-        Log.debug("x" + x.__str__())
-        Log.debug("y" + y.__str__())
+        x = [p3[0], p4[0], ball_circle]
+        y = [p3[1], p4[1], ball[3]]
+        x.sort(), y.sort()
+        Log.debug("x" + x.__str__() + " " + "y" + y.__str__())
 
         return x[1] == ball_circle or y[2] - y[0] <= 10
