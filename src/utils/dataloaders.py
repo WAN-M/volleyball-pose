@@ -75,8 +75,16 @@ class DigVideoLoader(VideoLoader):
     # 2. 球与手臂保持水平
     def _satisfy_(self, candidate, person, ball):
         # 垫球时左右臂从侧面看基本重合，先只判断左臂与球的位置关系
-        p3 = num2pos(3, candidate, person)
-        p4 = num2pos(4, candidate, person)
+        left = self._judge_([3, 4], candidate, person, ball)
+        right = self._judge_([6, 7], candidate, person, ball)
+
+        return left or right
+
+    def _judge_(self, pos, candidate, person, ball):
+        pos_x = pos[0]
+        pos_y = pos[1]
+        p3 = num2pos(pos_x, candidate, person)
+        p4 = num2pos(pos_y, candidate, person)
 
         if ball is None: return False
         ball_circle = (ball[0] + ball[2]) / 2
