@@ -16,7 +16,7 @@ debug = False
 rule = Rule(Action.Dig)
 
 # 视频取帧的间隔数
-video_gap = 5
+video_gap = 3
 
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes

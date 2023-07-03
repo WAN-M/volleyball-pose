@@ -21,6 +21,8 @@ volleyball_model = DetectMultiBackend(str(ROOT / 'model/yolov5x.pt'), device=dev
 # 帧中可能有多个人，从中选出需要分析的人
 def detect_person(image):
     candidate, subset = body_estimation(image)
+    if len(subset) == 0:
+        return None, []
     # util.draw_bodypose(image, candidate, subset)
     sort_subset = sorted(subset, key=lambda x: (-x[-2] / x[-1], -x[-1]))
     # print(sort_subset)
