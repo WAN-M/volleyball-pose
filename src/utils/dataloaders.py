@@ -22,7 +22,7 @@ class VideoLoader():
             candidate, person = detect_person(frame)
             ball = detect_ball(frame)
             try:
-                if self._satisfy_(candidate, person, ball):
+                if self._satisfy(candidate, person, ball):
                     break
             except Exception as e:
                 # traceback.print_exc()
@@ -33,7 +33,7 @@ class VideoLoader():
         self.sustaining = False
         Log.debug("视频已定位到垫球动作开始位置，从第%d帧开始检测" % self.cnt)
 
-    def _satisfy_(self, candidate, person, ball):
+    def _satisfy(self, candidate, person, ball):
         return False
 
     def __iter__(self):
@@ -53,7 +53,7 @@ class VideoLoader():
 
         # 该函数处于动作识别过程中，若未检测到关键点应该直接将该异常抛给更高层
         try:
-            result = self._satisfy_(candidate, person, ball)
+            result = self._satisfy(candidate, person, ball)
         except:
             Log.error("第%d帧存在关键点无法检测的行为" % self.cnt)
             return self.__next__()
@@ -73,14 +73,13 @@ class DigVideoLoader(VideoLoader):
 
     # 1. 球位于小臂之间
     # 2. 球与手臂保持水平
-    def _satisfy_(self, candidate, person, ball):
-        # 垫球时左右臂从侧面看基本重合，先只判断左臂与球的位置关系
-        left = self._judge_([3, 4], candidate, person, ball)
-        right = self._judge_([6, 7], candidate, person, ball)
+    def _satisfy(self, candidate, person, ball):
+        left = self.__judge([3, 4], candidate, person, ball)
+        right = self.__judge([6, 7], candidate, person, ball)
 
         return left or right
 
-    def _judge_(self, pos, candidate, person, ball):
+    def __judge(self, pos, candidate, person, ball):
         pos_x = pos[0]
         pos_y = pos[1]
         p3 = num2pos(pos_x, candidate, person)
@@ -93,4 +92,4 @@ class DigVideoLoader(VideoLoader):
         x.sort(), y.sort()
         Log.debug("x" + x.__str__() + " " + "y" + y.__str__())
 
-        return x[1] == ball_circle or y[2] - y[0] <= 10
+        return x[1] == ball_circle and y[2] - y[0] <= 10
