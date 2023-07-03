@@ -45,6 +45,7 @@ def solve(url):
     all_img = []
     if Path(url).suffix[1:] in VID_FORMATS:
         videoLoader = DigVideoLoader(url, video_gap)
+
         for candidate, person, ball, frame, round in videoLoader:
             if round > 1: break
             try:
@@ -87,4 +88,4 @@ if __name__ == '__main__':
     if debug:
         solve("./videos/standard.mp4")
     else:
-        app.run(host='localhost', port=5000, )
+        app.run(host='localhost', port=5000)
