@@ -10,7 +10,7 @@ from src.utils.dataloaders import DigVideoLoader
 from src.utils.detect import detect_person, detect_ball
 from src.utils.logger import Log
 
-debug = True
+debug = False
 
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
