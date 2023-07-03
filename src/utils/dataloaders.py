@@ -9,10 +9,14 @@ class VideoLoader():
     def __init__(self, url, gap):
         self.videoCapture = cv2.VideoCapture(url)
         Log.info("视频帧率: " + str(self.videoCapture.get(cv2.CAP_PROP_FPS)))
+        self.cnt = 0
         while True:
-            success, frame = self.videoCapture.read()
-            if not success:
-                break
+            self.cnt += 1
+            while self.cnt % gap != 0:
+                success, frame = self.videoCapture.read()
+                if not success:
+                    break
+                self.cnt += 1
             # cv2.imshow("ii", frame)
             # cv2.waitKey(0)
             candidate, person = detect_person(frame)
@@ -27,13 +31,13 @@ class VideoLoader():
         self.gap = gap
         self.round = 1
         self.sustaining = False
-        Log.debug("视频已定位到垫球动作开始位置")
+        Log.debug("视频已定位到垫球动作开始位置，从第%d帧开始检测" % self.cnt)
 
     def _satisfy_(self, candidate, person, ball):
         return False
 
     def __iter__(self):
-        self.cnt = 0
+        # self.cnt = 0
         return self
 
     def __next__(self):
@@ -46,12 +50,19 @@ class VideoLoader():
 
         candidate, person = detect_person(frame)
         ball = detect_ball(frame)
-        if self._satisfy_(candidate, person, ball):
-            if self.sustaining:
-                self.round += 1
-                self.sustaining = False
-        else:
-            self.sustaining = True
+
+        # 该函数处于动作识别过程中，若未检测到关键点应该直接将该异常抛给更高层
+        try:
+            result = self._satisfy_(candidate, person, ball)
+        except:
+            Log.error("第%d帧存在关键点无法检测的行为" % self.cnt)
+            return self.__next__()
+
+        if result and self.sustaining:
+            self.round += 1
+            self.sustaining = False
+
+        self.sustaining = result
 
         return candidate, person, ball, frame, self.round
 
@@ -67,12 +78,11 @@ class DigVideoLoader(VideoLoader):
         p3 = num2pos(3, candidate, person)
         p4 = num2pos(4, candidate, person)
 
+        if ball is None: return False
         ball_circle = (ball[0] + ball[2]) / 2
         x = [p3[0], p4[0], ball_circle]
         y = [p3[1], p4[1], ball[3]]
-        Log.debug("x" + x.__str__())
-        Log.debug("y" + y.__str__())
-        x.sort()
-        y.sort()
+        x.sort(), y.sort()
+        Log.debug("x" + x.__str__() + " " + "y" + y.__str__())
 
         return x[1] == ball_circle or y[2] - y[0] <= 10

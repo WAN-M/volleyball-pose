@@ -62,4 +62,4 @@ def run(
                 if (int(cls) == 32 and float(conf) > max_conf):
                     temp_xyxy = xyxy
                     max_conf = conf
-    return temp_xyxy
+    return [x.item() for x in temp_xyxy] if temp_xyxy is not None else None
