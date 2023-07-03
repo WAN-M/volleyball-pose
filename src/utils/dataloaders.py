@@ -82,14 +82,14 @@ class DigVideoLoader(VideoLoader):
     def __judge(self, pos, candidate, person, ball):
         pos_x = pos[0]
         pos_y = pos[1]
-        p3 = num2pos(pos_x, candidate, person)
-        p4 = num2pos(pos_y, candidate, person)
+        p1 = num2pos(pos_x, candidate, person)
+        p2 = num2pos(pos_y, candidate, person)
 
         if ball is None: return False
         ball_circle = (ball[0] + ball[2]) / 2
-        x = [p3[0], p4[0], ball_circle]
-        y = [p3[1], p4[1], ball[3]]
+        x = [p1[0], p2[0], ball_circle]
+        y = [p1[1], p2[1], ball[3]]
         x.sort(), y.sort()
         Log.debug("x" + x.__str__() + " " + "y" + y.__str__())
 
-        return x[1] == ball_circle and y[2] - y[0] <= 10
+        return x[1] == ball_circle and y[2] - y[0] <= 20
