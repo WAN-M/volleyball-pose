@@ -10,13 +10,11 @@ from src.utils.dataloaders import DigVideoLoader
 from src.utils.detect import detect_person, detect_ball
 from src.utils.logger import Log
 
-debug = False
+debug = True
 
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
 
-# 视频取帧的间隔数
-video_gap = 3
 
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
@@ -44,7 +42,7 @@ def solve(url):
     all_mes = set()
     all_img = []
     if Path(url).suffix[1:] in VID_FORMATS:
-        videoLoader = DigVideoLoader(url, video_gap)
+        videoLoader = DigVideoLoader(url)
 
         for candidate, person, ball, frame, round in videoLoader:
             if round > 1: break
@@ -90,6 +88,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./videos/standard.mp4")
+        solve("./videos/test3.mp4")
     else:
         app.run(host='localhost', port=5000)

@@ -51,7 +51,7 @@ def detect_arm_status(image, candidate, person):
         Log.debug("左臂角度为%f, 右臂角度为%f" %(leftAngle, rightAngle))
         # print("The left hand angle is %f, The right hand angle is %f" %(leftAngle, rightAngle))
     if leftAngle < 165 and leftAngle != 0 and rightAngle < 165 and rightAngle != 0:
-        Log.info("左臂不够直")
+        Log.info("手臂不够直")
         # print("The left hand isn't straight enough")
         util.draw_wrong_place(image, list1[1][0], list1[1][1])
         util.draw_wrong_place(image, list2[1][0], list2[1][1])
