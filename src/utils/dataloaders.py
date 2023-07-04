@@ -3,30 +3,8 @@ import math
 import numpy as np
 
 from src.utils.logger import Log
-from src.utils.util import num2pos
+from src.utils.util import arm_dis_ball
 from src.utils.detect import detect_person, detect_ball
-
-
-def point_dis_line(point, line_point1, line_point2):
-    # 计算向量
-    vec1 = line_point1 - point
-    vec2 = line_point2 - point
-    distance = np.abs(np.cross(vec1, vec2)) / np.linalg.norm(line_point1 - line_point2)
-    return distance
-
-
-def arm_dis_ball(candidate, person, ball):
-    p1 = num2pos(3, candidate, person)
-    p2 = num2pos(4, candidate, person)
-
-    if ball is None:
-        raise Exception()
-    arm_dis = math.dist(p1, p2)
-    ball_circle = [(ball[0] + ball[2]) / 2, (ball[1] + ball[3]) / 2]
-    ball_radius = abs(ball[3] - ball[1]) / 2
-    ball_to_arm = point_dis_line(ball_circle, p1, p2)
-    Log.info("球离手的距离是%f,球的半径是%f" %(ball_to_arm, ball_radius))
-    return ball_to_arm / ball_radius
 
 
 class VideoLoader():
@@ -92,8 +70,8 @@ class VideoLoader():
         candidate, person = detect_person(frame)
         ball = detect_ball(frame)
         self.set_gap(candidate, person, ball)
-        #cv2.imshow("frame", frame)
-        #cv2.waitKey(0)
+        # cv2.imshow("frame", frame)
+        # cv2.waitKey(0)
         # 该函数处于动作识别过程中，若未检测到关键点应该直接将该异常抛给更高层
         try:
             result = self._satisfy(candidate, person, ball)
@@ -107,7 +85,7 @@ class VideoLoader():
 
         self.sustaining = not result
 
-        return candidate, person, ball, frame, self.round
+        return candidate, person, ball, frame, self.round, result
 
 
 class DigVideoLoader(VideoLoader):

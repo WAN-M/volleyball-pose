@@ -44,12 +44,11 @@ def solve(url):
     if Path(url).suffix[1:] in VID_FORMATS:
         videoLoader = DigVideoLoader(url)
 
-        for candidate, person, ball, frame, round in videoLoader:
-            if round > 1: break
+        for candidate, person, ball, frame, round, result in videoLoader:
             # cv2.imshow("ii", frame)
             # cv2.waitKey(0)
             try:
-                pic_mes = rule(frame, candidate, person, ball)
+                pic_mes = rule(frame, candidate, person, ball, result)
             except Exception as e:
                 Log.error(str(e))
                 continue
@@ -64,6 +63,8 @@ def solve(url):
                 all_img.append(frame)
                 # cv2.imshow("ii", frame)
                 # cv2.waitKey(0)
+            if round > 1: break
+
 
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:

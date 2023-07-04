@@ -8,6 +8,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
+
+def point_dis_line(point, line_point1, line_point2):
+    # 计算向量
+    vec1 = line_point1 - point
+    vec2 = line_point2 - point
+    distance = np.abs(np.cross(vec1, vec2)) / np.linalg.norm(line_point1 - line_point2)
+    return distance
+
+
+def arm_dis_ball(candidate, person, ball):
+    p1 = num2pos(3, candidate, person)
+    p2 = num2pos(4, candidate, person)
+
+    if ball is None:
+        raise Exception()
+    ball_circle = [(ball[0] + ball[2]) / 2, (ball[1] + ball[3]) / 2]
+    ball_radius = abs(ball[3] - ball[1]) / 2
+    ball_to_arm = point_dis_line(ball_circle, p1, p2)
+    #Log.info("球离手的距离是%f,球的半径是%f" %(ball_to_arm, ball_radius))
+    return ball_to_arm / ball_radius
+
+
 def draw_wrong_place(img, x, y):
     cv2.circle(img, (int(x), int(y)), 10, (0, 0, 255), 1)
 

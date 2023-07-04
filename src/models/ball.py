@@ -48,6 +48,7 @@ def run(
 
     # Process predictions
     temp_xyxy = None
+    temp_xyxy2 = None
     for i, det in enumerate(pred):  # per image
 
         im0 = image.copy()
@@ -58,8 +59,20 @@ def run(
 
             # Write results
             max_conf = 0
+            max_conf2 = 0
             for *xyxy, conf, cls in reversed(det):
                 if (int(cls) == 32 and float(conf) > max_conf):
                     temp_xyxy = xyxy
                     max_conf = conf
-    return [x.item() for x in temp_xyxy] if temp_xyxy is not None else None
+                if (int(cls) == 38 and conf > max_conf2):
+                    length = abs(xyxy[2] - xyxy[0])
+                    width = abs(xyxy[3] - xyxy[1])
+                    if length / width > 0.8 and length / width < 1.25:
+                        temp_xyxy2 = xyxy
+                        max_conf2 = conf
+    if temp_xyxy is not None:
+        return [x.item() for x in temp_xyxy]
+    elif temp_xyxy2 is not None:
+        return [x.item() for x in temp_xyxy2]
+    else:
+        return None
