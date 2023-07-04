@@ -7,7 +7,7 @@ from src.utils.util import num2pos
 from src.utils.detect import detect_person, detect_ball
 
 
-def point_distance_line(point, line_point1, line_point2):
+def point_dis_line(point, line_point1, line_point2):
     # 计算向量
     vec1 = line_point1 - point
     vec2 = line_point2 - point
@@ -15,7 +15,7 @@ def point_distance_line(point, line_point1, line_point2):
     return distance
 
 
-def dis_arm_ball(candidate, person, ball):
+def arm_dis_ball(candidate, person, ball):
     p1 = num2pos(3, candidate, person)
     p2 = num2pos(4, candidate, person)
 
@@ -24,7 +24,7 @@ def dis_arm_ball(candidate, person, ball):
     arm_dis = math.dist(p1, p2)
     ball_circle = [(ball[0] + ball[2]) / 2, (ball[1] + ball[3]) / 2]
     ball_radius = abs(ball[3] - ball[1]) / 2
-    ball_to_arm = point_distance_line(ball_circle, p1, p2)
+    ball_to_arm = point_dis_line(ball_circle, p1, p2)
     Log.info("球离手的距离是%f,球的半径是%f" %(ball_to_arm, ball_radius))
     return ball_to_arm / ball_radius
 
@@ -65,7 +65,7 @@ class VideoLoader():
 
     def set_gap(self, candidate, person, ball):
         try:
-            dis = dis_arm_ball(candidate, person, ball)
+            dis = arm_dis_ball(candidate, person, ball)
             Log.info("球离手的距离是球的半径的%f倍" % dis)
             if dis < 5:
                 self.gap = 1
@@ -118,7 +118,7 @@ class DigVideoLoader(VideoLoader):
     # 2. 球与手臂保持水平
     def _satisfy(self, candidate, person, ball):
         try:
-            dis = dis_arm_ball(candidate, person, ball)
+            dis = arm_dis_ball(candidate, person, ball)
             return dis < 2
         except:
             Log.error("第%d帧存在关键点无法检测的行为" % self.cnt)
