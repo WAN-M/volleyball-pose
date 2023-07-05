@@ -9,6 +9,7 @@ from src.rules.rule import Rule
 from src.utils.dataloaders import DigVideoLoader
 from src.utils.detect import detect_person, detect_ball
 from src.utils.logger import Log
+from src.utils.util import arm_dis_ball
 
 debug = True
 
@@ -73,7 +74,12 @@ def solve(url):
         try:
             candidate, person = detect_person(image)
             ball = detect_ball(image)
-            pic_mes = rule(image, candidate, person, ball)
+            dis = arm_dis_ball(candidate, person, ball)
+            result = False
+            if dis < 2:
+                result = True
+            Log.info(result)
+            pic_mes = rule(image, candidate, person, ball, result)
         except Exception as e:
             Log.error(str(e))
         if len(pic_mes) > 0:
