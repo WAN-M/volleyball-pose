@@ -1,27 +1,43 @@
-import cv2
-import math
-import numpy as np
+import os
+from pathlib import Path
 
+import cv2
+
+from src.utils.detect import detect_person, detect_ball, ROOT
 from src.utils.logger import Log
 from src.utils.util import arm_dis_ball
-from src.utils.detect import detect_person, detect_ball
+
 
 
 class VideoLoader():
+    output_num = "001"
+    origin_format = output_num + ".avi"
+    output_format = output_num + ".mp4"
     def __init__(self, url):
         self.gap = 2
         self.videoCapture = cv2.VideoCapture(url)
-        Log.info("视频帧率: " + str(self.videoCapture.get(cv2.CAP_PROP_FPS)))
         self.cnt = 0
+        self.fps = int(self.videoCapture.get(cv2.CAP_PROP_FPS))
+        self.output_path = str(ROOT) + "/output/" + Path(url).stem
+        self.video = cv2.VideoWriter(self.output_path + VideoLoader.output_format,
+                                     cv2.VideoWriter_fourcc(*'MP4V'),
+                                     self.fps,
+                                     (int(self.videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                                      int(self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+
+        Log.info("视频帧率:%d " % self.fps)
         loop_cnt = 0
         while True:
             while loop_cnt < self.gap:
                 success, frame = self.videoCapture.read()
                 if not success:
+                    self.close()
                     break
+                # 开始的帧都视为未检测的
+                self.add_frame(frame)
                 loop_cnt += 1
                 self.cnt += 1
-            Log.info("第%d帧检测开始" % self.cnt)
+            Log.debug("第%d帧检测开始" % self.cnt)
             candidate, person = detect_person(frame)
             ball = detect_ball(frame)
             self.set_gap(candidate, person, ball)
@@ -37,6 +53,19 @@ class VideoLoader():
         self.round = 1
         self.sustaining = False
         Log.debug("视频已定位到垫球动作开始位置，从第%d帧开始检测" % self.cnt)
+
+    def add_frame(self, frame, detect=False):
+        if detect:
+            for i in range(self.fps):
+                self.video.write(frame)
+        else:
+            self.video.write(frame)
+
+    def close(self):
+        self.video.release()
+
+        # 将cv2导出的avi格式转成mp4格式
+        # os.system(f'ffmpeg -i "{self.output_path + self.origin_format}" -vcodec h264 "{self.output_path + self.output_format}"')
 
     def _satisfy(self, candidate, person, ball):
         return False
@@ -54,18 +83,24 @@ class VideoLoader():
         except:
             Log.error("第%d帧存在关键点无法检测的行为" % self.cnt)
 
+
     def __iter__(self):
         # self.cnt = 0
         return self
 
     def __next__(self):
         loop_cnt = 0
-        while loop_cnt < self.gap:
+        while True:
             success, frame = self.videoCapture.read()
             if not success:
+                self.close()
                 raise StopIteration
             loop_cnt += 1
             self.cnt += 1
+            if loop_cnt < self.gap:
+                self.add_frame(frame)
+            else:
+                break
         Log.info("第%d帧检测开始" % self.cnt)
         candidate, person = detect_person(frame)
         ball = detect_ball(frame)

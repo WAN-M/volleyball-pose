@@ -33,6 +33,29 @@ def arm_dis_ball(candidate, person, ball):
 def draw_wrong_place(img, x, y):
     cv2.circle(img, (int(x), int(y)), 10, (0, 0, 255), 1)
 
+def draw_messages(img, messages):
+    text = ""
+    for mes in messages:
+        text += mes + " "
+    text = text[0:-1]
+    # 设置字体参数
+    # font_path = "path_to_font_file.ttf"
+    font_size = 1.0
+    font_color = (255, 255, 255)  # 白色
+    thickness = 1
+
+    # 获取字体宽度和高度
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    (text_width, text_height), baseline = cv2.getTextSize(text, font, font_size, thickness)
+
+    # 计算文字位置
+    image_width, image_height, _ = img.shape
+    text_x = int((image_width - text_width) / 2)
+    text_y = image_height - int((image_height - text_height) / 2)
+
+    # 在图像上添加文字
+    cv2.putText(img, text, (text_x, text_y), font, font_size, font_color, thickness, cv2.LINE_AA)
+
 
 def num2pos(num, candidate, person)->[]:
     index = int(person[num])

@@ -11,11 +11,10 @@ from src.utils.detect import detect_person, detect_ball
 from src.utils.logger import Log
 from src.utils.util import arm_dis_ball
 
-debug = False
+debug = True
 
 # 目前只做垫球，后续可拓展
 rule = Rule(Action.Dig)
-
 
 IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm'  # include image suffixes
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
@@ -53,6 +52,7 @@ def solve(url):
             except Exception as e:
                 Log.error(str(e))
                 continue
+            videoLoader.add_frame(frame, True)
 
             # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
             flag = False
@@ -65,7 +65,8 @@ def solve(url):
                 # cv2.imshow("ii", frame)
                 # cv2.waitKey(0)
             if round > 1: break
-
+        videoLoader.close()
+        Log.info("视频输出已关闭")
 
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
@@ -95,6 +96,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./videos/test3.mp4")
+        solve("./videos/standard.mp4")
     else:
         app.run(host='localhost', port=5000)

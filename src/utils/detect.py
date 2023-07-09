@@ -4,12 +4,11 @@ from pathlib import Path
 from src.models.ball import run
 from src.models.body import Body
 from src.models.common import DetectMultiBackend
-from src.utils import util
 from src.utils.logger import Log
 from src.utils.torch_utils import select_device
 
 FILE = Path(__file__).resolve()
-ROOT = FILE.parents[2]  # YOLOv5 root directory
+ROOT = FILE.parents[2]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
 Log.info("项目运行目录: " + str(ROOT))

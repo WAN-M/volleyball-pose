@@ -1,7 +1,7 @@
 from src.rules.dig import armDetect, armTorsoAngle
 from src.rules.dig.ball_position import ball_position
 from src.utils.logger import Log
-from src.utils.util import arm_dis_ball
+from src.utils.util import arm_dis_ball, draw_messages
 
 
 def sum_rules(image, candidate, person, ball, result):
@@ -18,5 +18,8 @@ def sum_rules(image, candidate, person, ball, result):
                     mes.add("击球时球离手腕位置太远")
         except:
             Log.error("球未被识别")
+
+    if len(mes) > 0:
+        draw_messages(image, mes)
 
     return mes
