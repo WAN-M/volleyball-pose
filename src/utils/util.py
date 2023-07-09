@@ -2,6 +2,7 @@ import numpy as np
 import math
 import cv2
 import matplotlib
+from PIL import Image, ImageFont, ImageDraw
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
@@ -38,24 +39,30 @@ def draw_messages(img, messages):
     for mes in messages:
         text += mes + " "
     text = text[0:-1]
+
     # 设置字体参数
-    # font_path = "path_to_font_file.ttf"
-    font_size = 1.0
+    font_path = "font/simhei.ttf"
+    font_size = 20
     font_color = (255, 255, 255)  # 白色
-    thickness = 1
+    font_style = ImageFont.truetype(
+        font_path, font_size, encoding="utf-8"
+    )
 
     # 获取字体宽度和高度
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    (text_width, text_height), baseline = cv2.getTextSize(text, font, font_size, thickness)
+    text_width, text_height = font_style.getsize(text)
 
     # 计算文字位置
-    image_width, image_height, _ = img.shape
+    image_height, image_width, _ = img.shape
     text_x = int((image_width - text_width) / 2)
-    text_y = image_height - int((image_height - text_height) / 2)
+    text_y = image_height - text_height
 
     # 在图像上添加文字
-    cv2.putText(img, text, (text_x, text_y), font, font_size, font_color, thickness, cv2.LINE_AA)
+    if (isinstance(img, np.ndarray)):  # 判断是否OpenCV图片类型
+        img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
+    draw = ImageDraw.Draw(img)
+    draw.text((text_x, text_y), text, font_color, font=font_style)
+    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
 
 def num2pos(num, candidate, person)->[]:
     index = int(person[num])
