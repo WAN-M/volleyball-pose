@@ -43,31 +43,11 @@ def solve(url):
     all_img = []
     if Path(url).suffix[1:] in VID_FORMATS:
         videoLoader = DigVideoLoader(url)
-
-        for candidate, person, ball, frame, round, result in videoLoader:
-            # cv2.imshow("ii", frame)
-            # cv2.waitKey(0)
-            try:
-                pic_mes = rule(frame, candidate, person, ball, result)
-            except Exception as e:
-                Log.error(str(e))
-                continue
+        candidates, persons, balls, frames = videoLoader.get_all_pic()
+        rule(candidates, persons, balls, frames)
+        for frame in frames:
             videoLoader.add_frame(frame, True)
-
-            # 若当前帧中人物姿态出现了之前未出现的信息，则返回该图片
-            flag = False
-            for message in pic_mes:
-                if message not in all_mes:
-                    all_mes.add(message)
-                    flag = True
-            if flag:
-                all_img.append(frame)
-                # cv2.imshow("ii", frame)
-                # cv2.waitKey(0)
-            if round > 1: break
         videoLoader.close()
-        Log.info("视频输出已关闭")
-
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
