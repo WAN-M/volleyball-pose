@@ -28,7 +28,7 @@ def sum_rules(images, candidates, persons, balls):
     mes = set()
     if len(images) > 1:     # 不是图片
         if not legDetect.detect():
-            mes.add("腿部未蹬地发力")
+            mes.add("腿部动作有误")
 
         if len(mes) > 0:
             for image in images:
