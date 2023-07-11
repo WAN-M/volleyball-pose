@@ -25,7 +25,7 @@ class VideoLoader():
                                      self.fps,
                                      (int(self.videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
                                       int(self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-        self.frames = []            # 视频的每一帧
+        self.frames = dict()        # 视频的每一帧
         self.detect_num = []        # 选取了哪些帧号的帧用于检测
         self.p = 0                  # detect_num的指针
         Log.info("视频帧率:%d " % self.fps)
