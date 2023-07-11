@@ -76,6 +76,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./videos/standard.mp4")
+        solve("./videos/t.mp4")
     else:
         app.run(host='localhost', port=5000)
