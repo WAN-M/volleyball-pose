@@ -101,15 +101,14 @@ class VideoLoader():
         persons = []
         balls = []
         frames = []
-        self.detect_num.append(0)
         for candidate, person, ball, frame, round, result in self:
             candidates.append(candidate)
             persons.append(person)
             balls.append(ball)
             frames.append(frame)
-            self.add_frame(frame, True)
             if round > 1: break
         # 用于写入视频初始化
+        self.detect_num.append(0)
         return candidates, persons, balls, frames
 
     def __iter__(self):

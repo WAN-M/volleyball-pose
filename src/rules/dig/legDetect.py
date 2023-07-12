@@ -13,15 +13,15 @@ def get_points(points, candidates, persons):
 
 # 1. 大腿y坐标的变化大于最大值的30%
 # 2. 大腿y坐标在一轮里先大后小
-def one_leg(nums, candidates, persons) -> bool:
+def one_leg(images, nums, candidates, persons) -> bool:
     dis = []
     for i in range(len(persons)):
         try:
-            d = num2pos(nums[0], candidates[i], persons[i]) - \
-                num2pos(nums[1], candidates[i], persons[i])
+            d = num2pos(nums[1], candidates[i], persons[i]) - \
+                num2pos(nums[0], candidates[i], persons[i])
         except:
             continue
-        dis.append(d)
+        dis.append(d[1])
     if len(dis) < 3:
         Log.info("腿部有效信息不足")
         return True
@@ -42,14 +42,14 @@ def one_leg(nums, candidates, persons) -> bool:
 # 腿每次应该上下起伏
 def detect(images, candidates, persons) -> bool:
     flag = True
-    if not one_leg([8, 9], candidates, persons):
+    if not one_leg(images, [8, 9], candidates, persons):
         for i in range(len(images)):
             try:
                 draw_wrong_place(images[i], *num2pos(9, candidates[i], persons[i]))
             except:
                 continue
         flag = False
-    if not one_leg([11, 12], candidates, persons):
+    if not one_leg(images, [11, 12], candidates, persons):
         for i in range(len(images)):
             try:
                 draw_wrong_place(images[i], *num2pos(12, candidates[i], persons[i]))
