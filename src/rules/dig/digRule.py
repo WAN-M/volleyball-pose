@@ -27,12 +27,13 @@ def sum_rules(images, candidates, persons, balls):
             draw_messages(images[i], mes)
 
     # 需要整体判断的规则
-    mes = set()
     if len(images) > 1:     # 不是图片
+        mes2 = set()
         if not legDetect.detect(images, candidates, persons):
-            mes.add("腿部动作有误")
+            mes2.add("腿部动作有误")
 
-        if len(mes) > 0:
+        if len(mes2) > 0:
+            mes.add("腿部动作有误")
             for image in images:
-                draw_messages(image, mes)
+                draw_messages(image, mes2)
     return mes
