@@ -1,13 +1,12 @@
-import numpy as np
 import math
+
 import cv2
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-import numpy as np
-import matplotlib.pyplot as plt
-import cv2
 
 
 def point_dis_line(point, line_point1, line_point2):
