@@ -9,11 +9,11 @@ from src.utils.logger import Log
 from src.utils.util import arm_dis_ball
 
 
-
 class VideoLoader():
     output_num = "001"
     origin_format = output_num + ".avi"
     output_format = output_num + ".mp4"
+
     def __init__(self, url):
         self.gap = 2
         self.videoCapture = cv2.VideoCapture(url)
@@ -21,21 +21,22 @@ class VideoLoader():
         self.fps = int(self.videoCapture.get(cv2.CAP_PROP_FPS))
         self.output_path = str(ROOT) + "/output/" + Path(url).stem
         self.video = cv2.VideoWriter(self.output_path + VideoLoader.output_format,
-                                     cv2.VideoWriter_fourcc(*'MP4V'),
+                                     cv2.VideoWriter_fourcc(*'mp4v'),
                                      self.fps,
                                      (int(self.videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
                                       int(self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-        self.frames = dict()        # 视频的每一帧
-        self.detect_num = []        # 选取了哪些帧号的帧用于检测
-        self.p = 0                  # detect_num的指针
+        self.frames = dict()  # 视频的每一帧
+        self.detect_num = []  # 选取了哪些帧号的帧用于检测
+        self.p = 1  # detect_num的指针
         Log.info("视频帧率:%d " % self.fps)
         loop_cnt = 0
+
         while True:
             while loop_cnt < self.gap:
                 success, frame = self.videoCapture.read()
                 if not success:
                     self.close()
-                    break
+                    raise StopIteration
                 # 开始的帧都视为未检测的
                 self.add_frame(frame)
                 loop_cnt += 1
@@ -50,9 +51,9 @@ class VideoLoader():
                     break
             except Exception as e:
                 # traceback.print_exc()
-                Log.debug("未识别到所需信息")
-            #cv2.imshow("ii", frame)
-            #cv2.waitKey(0)
+                Log.error("第%d帧" % self.cnt + str(e))
+            # cv2.imshow("ii", frame)
+            # cv2.waitKey(0)
         self.round = 1
         self.sustaining = False
         Log.debug("视频已定位到垫球动作开始位置，从第%d帧开始检测" % self.cnt)
@@ -92,14 +93,15 @@ class VideoLoader():
                 self.gap = 3
             else:
                 self.gap = 5
-        except:
-            Log.error("第%d帧存在关键点无法检测的行为" % self.cnt)
+        except Exception as e:
+            Log.error("第%d帧" % self.cnt + str(e))
 
     def get_all_pic(self):
         candidates = []
         persons = []
         balls = []
         frames = []
+        self.detect_num.append(0)
         for candidate, person, ball, frame, round, result in self:
             candidates.append(candidate)
             persons.append(person)
@@ -108,7 +110,6 @@ class VideoLoader():
             self.add_frame(frame, True)
             if round > 1: break
         # 用于写入视频初始化
-        self.detect_num.append(0)
         return candidates, persons, balls, frames
 
     def __iter__(self):
@@ -122,11 +123,10 @@ class VideoLoader():
             if not success:
                 self.close()
                 raise StopIteration
+            self.add_frame(frame)
             loop_cnt += 1
             self.cnt += 1
-            if loop_cnt < self.gap:
-                self.add_frame(frame)
-            else:
+            if loop_cnt >= self.gap:
                 break
 
         self.detect_num.append(self.cnt)
@@ -159,8 +159,5 @@ class DigVideoLoader(VideoLoader):
     # 1. 球位于小臂之间
     # 2. 球与手臂保持水平
     def _satisfy(self, candidate, person, ball):
-        try:
-            dis = arm_dis_ball(candidate, person, ball)
-            return dis < 2
-        except:
-            Log.error("第%d帧存在关键点无法检测的行为" % self.cnt)
+        dis = arm_dis_ball(candidate, person, ball)
+        return dis < 2

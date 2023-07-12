@@ -44,7 +44,7 @@ def solve(url):
     if Path(url).suffix[1:] in VID_FORMATS:
         videoLoader = DigVideoLoader(url)
         candidates, persons, balls, frames = videoLoader.get_all_pic()
-        rule(candidates, persons, balls, frames)
+        rule(frames, candidates, persons, balls)
         for frame in frames:
             videoLoader.add_frame(frame, True)
         videoLoader.close()
