@@ -27,7 +27,7 @@ def arm_dis_ball(candidate, person, ball):
         p2 = num2pos(7, candidate, person)
 
     if ball is None:
-        raise Exception()
+        raise Exception("未检测到球")
     ball_circle = [(ball[0] + ball[2]) / 2, (ball[1] + ball[3]) / 2]
     ball_radius = abs(ball[3] - ball[1]) / 2
     ball_to_arm = point_dis_line(ball_circle, p1, p2)

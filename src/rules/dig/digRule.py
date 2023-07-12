@@ -3,6 +3,8 @@ from src.rules.dig.ball_position import ball_position
 from src.utils.logger import Log
 from src.utils.util import arm_dis_ball, draw_messages
 
+import cv2
+
 
 def sum_rules(images, candidates, persons, balls):
     # 需要每张图片遍历的规则
@@ -27,7 +29,7 @@ def sum_rules(images, candidates, persons, balls):
     # 需要整体判断的规则
     mes = set()
     if len(images) > 1:     # 不是图片
-        if not legDetect.detect():
+        if not legDetect.detect(images, candidates, persons):
             mes.add("腿部动作有误")
 
         if len(mes) > 0:
