@@ -53,14 +53,21 @@ def solve(url):
         image = cv2.imread(url, 1)
         pic_mes = ""
         try:
+            images = [image]
+            candidates = []
+            persons = []
+            balls = []
             candidate, person = detect_person(image)
             ball = detect_ball(image)
+            candidates.append(candidate)
+            persons.append(person)
+            balls.append(ball)
             dis = arm_dis_ball(candidate, person, ball)
             result = False
             if dis < 2:
                 result = True
             Log.info(result)
-            pic_mes = rule(image, candidate, person, ball, result)
+            pic_mes = rule(images, candidates, persons, balls, result)
         except Exception as e:
             Log.error(str(e))
         if len(pic_mes) > 0:
@@ -76,6 +83,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./videos/t.mp4")
+        solve("./images/im3.png")
     else:
         app.run(host='localhost', port=5000)

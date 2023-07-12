@@ -7,7 +7,7 @@ from src.utils.util import arm_dis_ball, draw_messages
 def sum_rules(images, candidates, persons, balls):
     # 需要每张图片遍历的规则
     mes = set()
-    for i in len(images):
+    for i in range(len(images)):
         if not armDetect.detect_arm_status(images[i], candidates[i], persons[i]):
             mes.add("手臂未保持直线")
         if not armTorsoAngle.detect(images[i], candidates[i], persons[i]):
