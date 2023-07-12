@@ -24,7 +24,8 @@ def sum_rules(images, candidates, persons, balls):
                 Log.error("球未被识别")
 
         if len(mes) > 0:
-            draw_messages(images[i], mes)
+            image = draw_messages(images[i], mes)
+            images[i] = image
 
     # 需要整体判断的规则
     if len(images) > 1:     # 不是图片
@@ -34,6 +35,9 @@ def sum_rules(images, candidates, persons, balls):
 
         if len(mes2) > 0:
             mes.add("腿部动作有误")
-            for image in images:
-                draw_messages(image, mes2)
+            for i in range(len(images)):
+                image = images[i]
+                image2 = draw_messages(image, mes2)
+                images[i] = image2
+
     return mes

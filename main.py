@@ -68,14 +68,20 @@ def solve(url):
                 result = True
             Log.info(result)
             pic_mes = rule(images, candidates, persons, balls, result)
+            if len(pic_mes) > 0:
+                all_mes = pic_mes
+                all_img.append(images[0])
+
         except Exception as e:
             Log.error(str(e))
-        if len(pic_mes) > 0:
-            all_mes = pic_mes
-            all_img.append(image)
     # 不存在有效图像
     else:
         raise Exception("上传的文件不符合要求")
+    #Log.info(all_mes)
+
+    # for image in images:
+    #     cv2.imshow("image", image)
+    #     cv2.waitKey(0)
     return list(all_mes), all_img
 
 
@@ -83,6 +89,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./videos/test3.mp4")
+        solve("./images/im3.png")
     else:
         app.run(host='localhost', port=5000)
