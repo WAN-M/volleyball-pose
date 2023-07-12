@@ -7,8 +7,12 @@ import cv2
 from copy import deepcopy
 
 def ball_position(image, candidate, person, ball):
-    p1 = num2pos(3, candidate, person)
-    p2 = num2pos(4, candidate, person)
+    try:
+        p1 = num2pos(3, candidate, person)
+        p2 = num2pos(4, candidate, person)
+    except:
+        p1 = num2pos(6, candidate, person)
+        p2 = num2pos(7, candidate, person)
     ball_circle = [(ball[0] + ball[2]) / 2, (ball[1] + ball[3]) / 2]
     vec1 = ball_circle - p1
     vec2 = ball_circle - p2
@@ -24,5 +28,8 @@ def ball_position(image, candidate, person, ball):
     # Log.debug("The position of p1,p2 and ball is (%f %f) (%f %f) (%f %f)"
     #           % (p1[0], p1[1], p2[0], p2[1], ball_circle[0], ball_circle[1]))
     # Log.debug("dis2 / dis1 = %f" % abs(dis2 / dis1))
+    if abs(dis2 / dis1) > 0.5:
+        Log.info("击球位置太离手腕太远")
+    Log.debug("球的位置检测完成")
 
     return abs(dis2 / dis1) < 0.5

@@ -62,6 +62,7 @@ class VideoLoader():
             num = self.detect_num[self.p - 1]
             while num < self.detect_num[self.p]:
                 self.video.write(self.frames[num])
+                num += 1
             self.p += 1
 
             for i in range(self.fps):
@@ -99,7 +100,7 @@ class VideoLoader():
         persons = []
         balls = []
         frames = []
-        for candidate, person, ball, frame, round in self:
+        for candidate, person, ball, frame, round, result in self:
             candidates.append(candidate)
             persons.append(person)
             balls.append(ball)

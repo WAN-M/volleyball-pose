@@ -23,19 +23,25 @@ def detect(image, candidate, person) -> bool:
     flag = True
     # print(candidate[person[5]][0:2])
     # 判断左臂与躯干，选取5,6,11
-    if not judge_angle(*util.num2pos(5, candidate, person),
-                       *util.num2pos(6, candidate, person),
-                       *util.num2pos(11, candidate, person)):
-        flag = False
-        util.draw_wrong_place(image, *util.num2pos(5, candidate, person))
-        Log.info("左臂抬起过高")
+    try:
+        if not judge_angle(*util.num2pos(5, candidate, person),
+                           *util.num2pos(6, candidate, person),
+                           *util.num2pos(11, candidate, person)):
+            flag = False
+            util.draw_wrong_place(image, *util.num2pos(5, candidate, person))
+            Log.info("左臂抬起过高")
+    except Exception as e:
+        Log.error(e)
     # 判断右臂与躯干，选取2,3,8
-    if not judge_angle(*util.num2pos(2, candidate, person),
-                       *util.num2pos(3, candidate, person),
-                       *util.num2pos(8, candidate, person)):
-        flag = False
-        util.draw_wrong_place(image, *util.num2pos(2, candidate, person))
-        Log.info("右臂抬起过高")
+    try:
+        if not judge_angle(*util.num2pos(2, candidate, person),
+                           *util.num2pos(3, candidate, person),
+                           *util.num2pos(8, candidate, person)):
+            flag = False
+            util.draw_wrong_place(image, *util.num2pos(2, candidate, person))
+            Log.info("右臂抬起过高")
+    except Exception as e:
+        Log.error(e)
     Log.debug("armTorsoAngle执行完成")
 
     return flag

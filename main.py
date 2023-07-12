@@ -83,6 +83,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./images/im3.png")
+        solve("./videos/test3.mp4")
     else:
         app.run(host='localhost', port=5000)
