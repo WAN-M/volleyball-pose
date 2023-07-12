@@ -68,6 +68,7 @@ class VideoLoader():
 
             for i in range(self.fps):
                 self.video.write(frame)
+
         else:
             # self.video.write(frame)
             # 将帧先存起来，后续完成需要检测的帧后再将前面的帧一同写入
@@ -101,14 +102,14 @@ class VideoLoader():
         persons = []
         balls = []
         frames = []
+        # 用于写入视频初始化
+        self.detect_num.append(0)
         for candidate, person, ball, frame, round, result in self:
             candidates.append(candidate)
             persons.append(person)
             balls.append(ball)
             frames.append(frame)
             if round > 1: break
-        # 用于写入视频初始化
-        self.detect_num.append(0)
         return candidates, persons, balls, frames
 
     def __iter__(self):

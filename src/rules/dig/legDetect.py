@@ -45,14 +45,14 @@ def detect(images, candidates, persons) -> bool:
     if not one_leg(images, [8, 9], candidates, persons):
         for i in range(len(images)):
             try:
-                draw_wrong_place(images[i], *num2pos(9, candidates[i], persons[i]))
+                draw_wrong_place(images[i], *num2pos(8, candidates[i], persons[i]))
             except:
                 continue
         flag = False
     if not one_leg(images, [11, 12], candidates, persons):
         for i in range(len(images)):
             try:
-                draw_wrong_place(images[i], *num2pos(12, candidates[i], persons[i]))
+                draw_wrong_place(images[i], *num2pos(11, candidates[i], persons[i]))
             except:
                 continue
         flag = False
