@@ -31,7 +31,12 @@ def get_armPoint(armIndex, candidate, person):
         # x, y = candidate[index][0:2]
         # list1[n].append(x)
         # list1[n].append(y)
-        list1[n] = util.num2pos(armIndex[n], candidate, person)
+        try:
+            list1[n] = util.num2pos(armIndex[n], candidate, person)
+        except:
+            list1 = None
+            break
+
         #print(list1)
     return list1
 
