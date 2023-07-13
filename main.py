@@ -51,7 +51,6 @@ def solve(url):
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
-        pic_mes = ""
         try:
             images = [image]
             candidates = []
@@ -62,12 +61,7 @@ def solve(url):
             candidates.append(candidate)
             persons.append(person)
             balls.append(ball)
-            dis = arm_dis_ball(candidate, person, ball)
-            result = False
-            if dis < 2:
-                result = True
-            Log.info(result)
-            pic_mes = rule(images, candidates, persons, balls, result)
+            pic_mes = rule(images, candidates, persons, balls)
             if len(pic_mes) > 0:
                 all_mes = pic_mes
                 all_img.append(images[0])
@@ -79,9 +73,9 @@ def solve(url):
         raise Exception("上传的文件不符合要求")
     #Log.info(all_mes)
 
-    # for image in images:
-    #     cv2.imshow("image", image)
-    #     cv2.waitKey(0)
+    for image in all_img:
+        cv2.imshow("image", image)
+        cv2.waitKey(0)
     return list(all_mes), all_img
 
 
@@ -89,6 +83,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./images/im3.png")
+        solve("./images/wrong.jpg")
     else:
         app.run(host='localhost', port=5000)
