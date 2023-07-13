@@ -11,7 +11,7 @@ def sum_rules(images, candidates, persons, balls):
     mes = set()
     for i in range(len(images)):
         if not armDetect.detect_arm_status(images[i], candidates[i], persons[i]):
-            mes.add("手臂未保持直线")
+            mes.add("手臂没有伸直")
         if not armTorsoAngle.detect(images[i], candidates[i], persons[i]):
             mes.add("手臂与躯干最大角度不应超过100°")
         if arm_dis_ball(candidates[i], persons[i], balls[i]) < 2:
