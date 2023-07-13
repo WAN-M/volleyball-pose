@@ -28,13 +28,12 @@ def process():
     client_ip = request.environ.get('REMOTE_ADDR')
     Log.info("IP: " + client_ip + " FILE: " + url)
     try:
-        messages, images = solve(url)
+        result = solve(url)
+        Log.info("完成请求: %s" % url)
+        return result
     except Exception as e:
         Log.error(str(e))
         return CommonResult.fail(str(e))
-    else:
-        Log.info("完成请求: %s" % url)
-        return CommonResult.success(messages, images)
 
 
 def solve(url):
@@ -48,35 +47,22 @@ def solve(url):
         for frame in frames:
             videoLoader.add_frame(frame, True)
         videoLoader.close()
+        # 只返回生成的视频
+        return CommonResult.success(None, None, videoLoader.output_path)
     # 上传的图片
     elif Path(url).suffix[1:] in IMG_FORMATS:
         image = cv2.imread(url, 1)
-        try:
-            images = [image]
-            candidates = []
-            persons = []
-            balls = []
-            candidate, person = detect_person(image)
-            ball = detect_ball(image)
-            candidates.append(candidate)
-            persons.append(person)
-            balls.append(ball)
-            pic_mes = rule(images, candidates, persons, balls)
-            if len(pic_mes) > 0:
-                all_mes = pic_mes
-                all_img.append(images[0])
+        candidate, person = detect_person(image)
+        ball = detect_ball(image)
+        pic_mes = rule([image], [candidate], [person], [ball])
+        if len(pic_mes) > 0:
+            all_mes = pic_mes
+            all_img.append(image)
 
-        except Exception as e:
-            Log.error(str(e))
+        return CommonResult.success(all_mes, all_img)
     # 不存在有效图像
     else:
         raise Exception("上传的文件不符合要求")
-    #Log.info(all_mes)
-
-    for image in all_img:
-        cv2.imshow("image", image)
-        cv2.waitKey(0)
-    return list(all_mes), all_img
 
 
 # 项目总入口，传入视频进行处理
