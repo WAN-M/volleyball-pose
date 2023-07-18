@@ -1,6 +1,4 @@
-import os
 from pathlib import Path
-from queue import Queue
 
 import cv2
 
@@ -27,7 +25,7 @@ class VideoLoader():
                                       int(self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
         self.frames = dict()  # 视频的每一帧
         self.detect_num = []  # 选取了哪些帧号的帧用于检测
-        self.p = 1  # detect_num的指针
+        self.p = 0  # detect_num的指针
         Log.info("视频帧率:%d " % self.fps)
         loop_cnt = 0
 
@@ -38,9 +36,9 @@ class VideoLoader():
                     self.close()
                     raise StopIteration
                 # 开始的帧都视为未检测的
-                self.add_frame(frame)
                 loop_cnt += 1
                 self.cnt += 1
+                self.add_frame(frame)
             Log.debug("第%d帧检测开始" % self.cnt)
             candidate, person = detect_person(frame)
             ball = detect_ball(frame)
@@ -58,17 +56,29 @@ class VideoLoader():
         self.sustaining = False
         Log.debug("视频已定位到垫球动作开始位置，从第%d帧开始检测" % self.cnt)
 
+    def test(self):
+        for i in range(len(self.frames)):
+            cv2.imshow("ii", self.frames[i + 1])
+            cv2.waitKey(0)
+
     def add_frame(self, frame, detect=False):
         if detect:
-            num = self.detect_num[self.p - 1]
+            print("检测" + str(self.detect_num[self.p]))
+            num = self.detect_num[self.p - 1] + 1
             while num < self.detect_num[self.p]:
                 self.video.write(self.frames[num])
+                print("写入" + str(num))
                 num += 1
             self.p += 1
 
+            print("原图像")
+            cv2.imshow("original", self.frames[self.p])
+            cv2.waitKey(0)
+            print("绘制后")
+            cv2.imshow("after", frame)
+            cv2.waitKey(0)
             for i in range(self.fps):
                 self.video.write(frame)
-
         else:
             # self.video.write(frame)
             # 将帧先存起来，后续完成需要检测的帧后再将前面的帧一同写入
@@ -102,14 +112,16 @@ class VideoLoader():
         persons = []
         balls = []
         frames = []
-        # 用于写入视频初始化
-        self.detect_num.append(0)
-        for candidate, person, ball, frame, round, result in self:
+
+        for candidate, person, ball, frame in self:
             candidates.append(candidate)
             persons.append(person)
             balls.append(ball)
             frames.append(frame)
-            if round > 1: break
+            if self.round > 1: break
+
+        # 用于写入视频初始化
+        self.detect_num.append(0)
         return candidates, persons, balls, frames
 
     def __iter__(self):
@@ -123,13 +135,13 @@ class VideoLoader():
             if not success:
                 self.close()
                 raise StopIteration
-            self.add_frame(frame)
+
             loop_cnt += 1
             self.cnt += 1
+            self.add_frame(frame)
             if loop_cnt >= self.gap:
                 break
 
-        self.detect_num.append(self.cnt)
         Log.info("第%d帧检测开始" % self.cnt)
         candidate, person = detect_person(frame)
         ball = detect_ball(frame)
@@ -149,7 +161,9 @@ class VideoLoader():
 
         self.sustaining = not result
 
-        return candidate, person, ball, frame, self.round, result
+        self.detect_num.append(self.cnt)
+
+        return candidate, person, ball, frame
 
 
 class DigVideoLoader(VideoLoader):

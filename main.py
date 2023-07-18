@@ -9,7 +9,6 @@ from src.rules.rule import Rule
 from src.utils.dataloaders import DigVideoLoader
 from src.utils.detect import detect_person, detect_ball
 from src.utils.logger import Log
-from src.utils.util import arm_dis_ball
 
 debug = True
 
@@ -44,6 +43,8 @@ def solve(url):
         videoLoader = DigVideoLoader(url)
         candidates, persons, balls, frames = videoLoader.get_all_pic()
         rule(frames, candidates, persons, balls)
+        # videoLoader.test()
+        print("图像共%d张" % len(frames))
         for frame in frames:
             videoLoader.add_frame(frame, True)
         videoLoader.close()
@@ -69,6 +70,6 @@ def solve(url):
 if __name__ == '__main__':
     Log.info("项目已启动")
     if debug:
-        solve("./images/wrong.jpg")
+        solve("./videos/standard.mp4")
     else:
         app.run(host='localhost', port=5000)
