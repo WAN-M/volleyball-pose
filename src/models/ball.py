@@ -58,18 +58,18 @@ def run(
             det[:, :4] = scale_boxes(im.shape[2:], det[:, :4], im0.shape).round()
 
             # Write results
-            max_conf = 0
-            max_conf2 = 0
+            max_size = 0
+            max_size2 = 0
             for *xyxy, conf, cls in reversed(det):
-                if (int(cls) == 32 and float(conf) > max_conf):
+                length = abs(xyxy[2] - xyxy[0])
+                if (int(cls) == 32 and length > max_size):
                     temp_xyxy = xyxy
-                    max_conf = conf
-                if (int(cls) == 38 and conf > max_conf2):
-                    length = abs(xyxy[2] - xyxy[0])
+                    max_size = length
+                if (int(cls) == 38 and length > max_size2):
                     width = abs(xyxy[3] - xyxy[1])
                     if length / width > 0.8 and length / width < 1.25:
                         temp_xyxy2 = xyxy
-                        max_conf2 = conf
+                        max_size2 = length
     if temp_xyxy is not None:
         return [x.item() for x in temp_xyxy]
     elif temp_xyxy2 is not None:
